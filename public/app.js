@@ -74,6 +74,24 @@ function mostrarReserva(r) {
     .filter(Boolean)
     .join(" ");
 
+  // Si el check-in AÚN no está hecho, preparamos el botón para realizarlo.
+  // Construimos la URL con el número de reserva y el correo del huésped.
+  let bloqueCheckin = "";
+  if (!r.checked_in) {
+    const urlCheckin =
+      "https://checkin.lobbypms.com/welcome" +
+      `?codigo=${encodeURIComponent(r.booking_id)}` +
+      `&email=${encodeURIComponent(huesped.email || "")}` +
+      "&lg=es";
+    bloqueCheckin = `
+      <a class="boton-checkin" href="${urlCheckin}">
+        ✅ Realizar mi check-in en línea
+      </a>`;
+  } else {
+    bloqueCheckin = `
+      <p class="checkin-listo">✔️ Tu check-in ya está realizado.</p>`;
+  }
+
   resultado.classList.remove("oculto");
   resultado.innerHTML = `
     <div class="tarjeta-reserva">
@@ -94,6 +112,7 @@ function mostrarReserva(r) {
         ${fila("Pagado", formatearDinero(r.paid_out))}
         ${fila("Check-in realizado", estado(r.checked_in))}
         ${fila("Check-out realizado", estado(r.checked_out))}
+        ${bloqueCheckin}
       </div>
     </div>
   `;
