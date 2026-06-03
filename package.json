@@ -1,0 +1,7 @@
+{
+  "name": "kuyay-reservaciones",
+  "version": "1.0.0",
+  "description": "Aplicación web para consultar reservaciones activas del Hotel Kuyay.",
+  "type": "module",
+  "private": true
+}

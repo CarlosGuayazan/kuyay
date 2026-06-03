@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Consulta de Reservaciones · Kuyay</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="hero">
+      <h1>🏨 Consulta tu Reservación</h1>
+      <p>Ingresa uno de tus datos y te mostraremos tu reservación activa.</p>
+    </header>
+
+    <main>
+      <form id="formulario" class="tarjeta">
+        <p class="ayuda">
+          Para proteger tu privacidad, te recomendamos buscar con tu
+          <strong>número de reservación</strong> junto con tu
+          <strong>correo</strong>.
+        </p>
+
+        <label for="numeroReserva">Número de reservación</label>
+        <input
+          type="text"
+          id="numeroReserva"
+          name="numeroReserva"
+          placeholder="Ej: 20491561"
+          autocomplete="off"
+        />
+
+        <label for="email">Correo electrónico</label>
+        <input
+          type="email"
+          id="email"
+          name="email"
+          placeholder="tucorreo@ejemplo.com"
+          autocomplete="off"
+        />
+
+        <details>
+          <summary>Más opciones de búsqueda</summary>
+          <label for="nombre">Nombre del titular</label>
+          <input
+            type="text"
+            id="nombre"
+            name="nombre"
+            placeholder="Ej: Isabel Guerra"
+            autocomplete="off"
+          />
+
+          <label for="telefono">Teléfono</label>
+          <input
+            type="text"
+            id="telefono"
+            name="telefono"
+            placeholder="Ej: +57 312 5772922"
+            autocomplete="off"
+          />
+        </details>
+
+        <button type="submit" id="botonBuscar">Buscar reservación</button>
+      </form>
+
+      <!-- Aquí aparecerá el resultado -->
+      <section id="resultado" class="resultado oculto"></section>
+    </main>
+
+    <footer>
+      <p>Hotel Kuyay · Sistema de consulta de reservaciones</p>
+    </footer>
+
+    <script src="app.js"></script>
+  </body>
+</html>

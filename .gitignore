@@ -1,0 +1,14 @@
+# Secretos: NUNCA subir a GitHub
+.env
+.env.local
+.env*.local
+
+# Dependencias
+node_modules/
+
+# Archivos de Vercel
+.vercel
+
+# Sistema
+.DS_Store
+Thumbs.db

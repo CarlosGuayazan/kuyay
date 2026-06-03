@@ -1,0 +1,220 @@
+/* ===== Estilos de la aplicación ===== */
+
+:root {
+  --color-principal: #1f6feb;
+  --color-principal-oscuro: #1a5fd0;
+  --color-fondo: #f4f6fb;
+  --color-tarjeta: #ffffff;
+  --color-texto: #1c2333;
+  --color-texto-suave: #5b6577;
+  --color-borde: #dfe3ec;
+  --color-exito: #15803d;
+  --color-error: #b42318;
+  --radio: 14px;
+  --sombra: 0 10px 30px rgba(20, 30, 60, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  background: var(--color-fondo);
+  color: var(--color-texto);
+  line-height: 1.5;
+}
+
+.hero {
+  text-align: center;
+  padding: 48px 20px 24px;
+}
+
+.hero h1 {
+  margin: 0 0 8px;
+  font-size: 1.8rem;
+}
+
+.hero p {
+  margin: 0;
+  color: var(--color-texto-suave);
+}
+
+main {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+
+.tarjeta {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.ayuda {
+  margin: 0 0 16px;
+  font-size: 0.9rem;
+  color: var(--color-texto-suave);
+  background: #eef4ff;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  margin-top: 12px;
+}
+
+input {
+  padding: 12px 14px;
+  border: 1px solid var(--color-borde);
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+input:focus {
+  border-color: var(--color-principal);
+}
+
+details {
+  margin-top: 12px;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--color-principal);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+button {
+  margin-top: 20px;
+  padding: 14px;
+  background: var(--color-principal);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+button:hover {
+  background: var(--color-principal-oscuro);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ===== Resultado ===== */
+
+.resultado {
+  margin-top: 24px;
+}
+
+.oculto {
+  display: none;
+}
+
+.tarjeta-reserva {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+.tarjeta-reserva header {
+  background: var(--color-principal);
+  color: white;
+  padding: 18px 22px;
+}
+
+.tarjeta-reserva header h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.tarjeta-reserva header span {
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.cuerpo-reserva {
+  padding: 22px;
+}
+
+.fila {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-borde);
+  gap: 12px;
+}
+
+.fila:last-child {
+  border-bottom: none;
+}
+
+.fila .etiqueta {
+  color: var(--color-texto-suave);
+  font-size: 0.9rem;
+}
+
+.fila .valor {
+  font-weight: 600;
+  text-align: right;
+}
+
+.etiqueta-estado {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.estado-si {
+  background: #dcfce7;
+  color: var(--color-exito);
+}
+
+.estado-no {
+  background: #fee2e2;
+  color: var(--color-error);
+}
+
+.mensaje {
+  background: var(--color-tarjeta);
+  border: 1px solid var(--color-borde);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+  padding: 24px;
+  text-align: center;
+  color: var(--color-texto-suave);
+}
+
+.mensaje.error {
+  border-color: #fca5a5;
+  color: var(--color-error);
+}
+
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--color-texto-suave);
+  font-size: 0.85rem;
+}
