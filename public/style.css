@@ -60,16 +60,34 @@ body {
 
 .hero {
   text-align: center;
-  padding: 24px 20px 24px;
+  padding: 0 20px 24px;
+}
+
+.banner {
+  width: 100%;
+  height: 200px;
+  background-image: url("https://kuyay.co/wp-content/uploads/2025/07/Generated-Image-July-24-2025-6_27PM.jpeg");
+  background-size: cover;
+  background-position: center 25%;
+  background-repeat: no-repeat;
 }
 
 .logo {
   display: block;
-  width: 88px;
-  height: 88px;
-  border-radius: 22px;
-  margin: 0 auto 14px;
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 24px;
+  margin: -56px auto 14px;
+  border: 4px solid #fff;
+  background: #fff;
   box-shadow: 0 8px 22px rgba(255, 136, 0, 0.35);
+}
+
+@media (max-width: 460px) {
+  .banner {
+    height: 150px;
+  }
 }
 
 .hero h1 {
