@@ -197,6 +197,50 @@ button:disabled {
   color: var(--color-error);
 }
 
+/* ===== Sección de disponibilidad ===== */
+
+.disponibilidad {
+  margin-top: 24px;
+}
+
+.disponibilidad h2 {
+  margin: 0 0 4px;
+  font-size: 1.2rem;
+}
+
+.botones-hostels {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.boton-hostel {
+  flex: 1;
+  display: block;
+  padding: 16px 12px;
+  background: #eef4ff;
+  color: var(--color-principal);
+  border: 2px solid var(--color-principal);
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1rem;
+  transition: background 0.15s, color 0.15s;
+}
+
+.boton-hostel:hover {
+  background: var(--color-principal);
+  color: white;
+}
+
+/* En pantallas pequeñas, los botones se apilan */
+@media (max-width: 460px) {
+  .botones-hostels {
+    flex-direction: column;
+  }
+}
+
 .boton-checkin {
   display: block;
   margin-top: 18px;

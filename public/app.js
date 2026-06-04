@@ -84,7 +84,7 @@ function mostrarReserva(r) {
       `&email=${encodeURIComponent(huesped.email || "")}` +
       "&lg=es";
     bloqueCheckin = `
-      <a class="boton-checkin" href="${urlCheckin}">
+      <a class="boton-checkin" href="${urlCheckin}" target="_blank" rel="noopener noreferrer">
         ✅ Realizar mi check-in en línea
       </a>`;
   } else {
