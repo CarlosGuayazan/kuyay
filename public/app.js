@@ -113,6 +113,7 @@ function mostrarReserva(r) {
         ${fila("Check-in realizado", estado(r.checked_in))}
         ${fila("Check-out realizado", estado(r.checked_out))}
         ${bloqueCheckin}
+        ${typeof construirSeccionPago === "function" ? construirSeccionPago(r) : ""}
       </div>
     </div>
   `;
