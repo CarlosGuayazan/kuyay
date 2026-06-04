@@ -287,3 +287,40 @@ footer {
   color: var(--color-texto-suave);
   font-size: 0.85rem;
 }
+
+/* ===== Teclado en pantalla (isla de registro táctil) ===== */
+
+#teclado-tactil {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #e9edf5;
+  padding: 10px;
+  box-shadow: 0 -6px 24px rgba(20, 30, 60, 0.18);
+  z-index: 1000;
+  transition: transform 0.25s ease;
+}
+
+/* Cuando está oculto, se desliza hacia abajo fuera de la pantalla. */
+#teclado-tactil.teclado-oculto {
+  transform: translateY(110%);
+}
+
+#teclado-tactil .simple-keyboard {
+  max-width: 920px;
+  margin: 0 auto;
+  background: transparent;
+}
+
+/* Teclas grandes y cómodas para tocar con el dedo. */
+#teclado-tactil .hg-button {
+  height: 56px;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+/* Margen inferior extra para que el teclado no tape el contenido. */
+body.con-teclado {
+  padding-bottom: 320px;
+}
