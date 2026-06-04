@@ -42,7 +42,18 @@
   function abrirModal(html) {
     contenido.innerHTML = html;
     overlay.classList.remove("oculto");
+    // En la isla, genera los códigos QR del modal (Cripto, etc.).
+    if (window.generarQRsEn) window.generarQRsEn(contenido);
   }
+
+  const esKiosko = () => !!window.ES_KIOSKO;
+
+  // El botón "Reportar por WhatsApp" es un enlace externo: en la isla NO se
+  // muestra (el huésped escanea el QR de WhatsApp que ya aparece arriba).
+  const botonWhatsapp = () =>
+    esKiosko()
+      ? ""
+      : `<a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">${t("trBtnWhatsapp")}</a>`;
   function cerrarModal() {
     overlay.classList.add("oculto");
     contenido.innerHTML = "";
@@ -117,7 +128,7 @@
       </div>
       <p class="reporte-titulo">${t("trReporta")}</p>
       <img class="qr" src="${QR_WHATSAPP}" alt="QR WhatsApp" />
-      <a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">${t("trBtnWhatsapp")}</a>
+      ${botonWhatsapp()}
       <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`;
   }
 
@@ -130,8 +141,8 @@
       <p class="aviso-recargo">${t("woRecargo")}</p>
       <p>${t("woSaldo")} ${formatearDinero(saldo)}</p>
       <p class="monto-grande">${t("woTotal")} ${formatearDinero(conRecargo)}</p>
-      <a class="boton-pago-accion" href="${WOMPI_LINK}" target="_blank" rel="noopener noreferrer">${t("woBtnPagar")}</a>
-      <p class="reporte-titulo">${t("woEscanea")}</p>
+      ${esKiosko() ? "" : `<a class="boton-pago-accion" href="${WOMPI_LINK}" target="_blank" rel="noopener noreferrer">${t("woBtnPagar")}</a>`}
+      <p class="reporte-titulo">${esKiosko() ? t("qrPagar") : t("woEscanea")}</p>
       <img class="qr" src="${WOMPI_QR}" alt="QR Wompi" />
       <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`;
   }
@@ -159,14 +170,18 @@
           ${notaTasa}
           <p class="reporte-titulo">${t("ppReporta")}</p>
           <img class="qr" src="${QR_WHATSAPP}" alt="QR WhatsApp" />
-          <a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">${t("trBtnWhatsapp")}</a>
+          ${botonWhatsapp()}
           <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`);
       } else {
         abrirModal(`
           <h2>${t("crTitulo")}</h2>
           <p class="monto-grande">${t("montoLbl")} $${usd.toFixed(2)} USD</p>
           ${notaTasa}
-          <a class="boton-pago-accion" href="${CRIPTO_LINK}" target="_blank" rel="noopener noreferrer">${t("crBtnPagar")}</a>
+          ${
+            esKiosko()
+              ? `<div class="qr-bloque"><img class="qr qr-dinamico" data-qr="${CRIPTO_LINK}" alt="QR" /><p class="qr-texto">${t("qrPagar")}</p></div>`
+              : `<a class="boton-pago-accion" href="${CRIPTO_LINK}" target="_blank" rel="noopener noreferrer">${t("crBtnPagar")}</a>`
+          }
           <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`);
       }
     } catch (err) {

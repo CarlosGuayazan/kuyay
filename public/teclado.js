@@ -10,18 +10,8 @@
 
 (function () {
   // ---- 1) Decidir si debemos mostrar el teclado ----
-  const ua = navigator.userAgent || "";
-  const esMovilOTablet =
-    /Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle|PlayBook|BlackBerry|Opera Mini|IEMobile/i.test(
-      ua
-    );
-  const tienePantallaTactil =
-    (navigator.maxTouchPoints || 0) > 0 || "ontouchstart" in window;
-  const forzadoPorUrl = new URLSearchParams(location.search).has("kiosko");
-
-  const debeMostrar = forzadoPorUrl || (!esMovilOTablet && tienePantallaTactil);
-
-  if (!debeMostrar) return; // No se necesita teclado en pantalla.
+  // Usamos la misma detección de kiosko que app.js (window.ES_KIOSKO).
+  if (!window.ES_KIOSKO) return; // No se necesita teclado en pantalla.
   if (!window.SimpleKeyboard) return; // Por si el CDN no cargó.
 
   const Keyboard = window.SimpleKeyboard.default;

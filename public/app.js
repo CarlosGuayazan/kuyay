@@ -12,6 +12,35 @@ const botonBuscar = document.getElementById("botonBuscar");
 const T = (clave, vars) => (window.I18N ? I18N.t(clave, vars) : clave);
 const LOCALE = () => (window.I18N ? I18N.locale : "es-CO");
 
+// ¿Estamos en la isla de registro (kiosko)? Lo usan también pagos.js y teclado.js.
+// Es kiosko si la URL trae ?kiosko=1, o si es una computadora con pantalla táctil.
+window.ES_KIOSKO = (function () {
+  const ua = navigator.userAgent || "";
+  const esMovilOTablet =
+    /Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle|PlayBook|BlackBerry|Opera Mini|IEMobile/i.test(
+      ua
+    );
+  const tienePantallaTactil =
+    (navigator.maxTouchPoints || 0) > 0 || "ontouchstart" in window;
+  const forzadoPorUrl = new URLSearchParams(location.search).has("kiosko");
+  return forzadoPorUrl || (!esMovilOTablet && tienePantallaTactil);
+})();
+
+// Genera los códigos QR dentro de un contenedor (busca <img data-qr="URL">).
+// Se hace en el navegador, sin enviar la URL a ningún servicio externo.
+window.generarQRsEn = function (contenedor) {
+  if (!contenedor || typeof qrcode !== "function") return;
+  contenedor.querySelectorAll("img[data-qr]").forEach((img) => {
+    const url = img.getAttribute("data-qr");
+    try {
+      const qr = qrcode(0, "M"); // tipo automático, corrección media
+      qr.addData(url);
+      qr.make();
+      img.src = qr.createDataURL(6, 12); // píxeles por módulo, margen
+    } catch (e) {}
+  });
+};
+
 // Guardamos la última reserva mostrada para volver a dibujarla
 // si el huésped cambia de idioma.
 let ultimaReserva = null;
@@ -89,7 +118,7 @@ function mostrarReserva(r) {
     .filter(Boolean)
     .join(" ");
 
-  // Si el check-in AÚN no está hecho, preparamos el botón para realizarlo.
+  // Si el check-in AÚN no está hecho, preparamos cómo realizarlo.
   let bloqueCheckin = "";
   if (!r.checked_in) {
     const urlCheckin =
@@ -97,10 +126,20 @@ function mostrarReserva(r) {
       `?codigo=${encodeURIComponent(r.booking_id)}` +
       `&email=${encodeURIComponent(huesped.email || "")}` +
       "&lg=es";
-    bloqueCheckin = `
-      <a class="boton-checkin" href="${urlCheckin}" target="_blank" rel="noopener noreferrer">
-        ${T("btnCheckin")}
-      </a>`;
+    if (window.ES_KIOSKO) {
+      // En la isla: QR para que el huésped lo haga en su celular.
+      bloqueCheckin = `
+        <div class="qr-bloque">
+          <img class="qr qr-dinamico" data-qr="${urlCheckin}" alt="QR check-in" />
+          <p class="qr-texto">${T("qrCheckin")}</p>
+        </div>`;
+    } else {
+      // En celular/PC: botón normal.
+      bloqueCheckin = `
+        <a class="boton-checkin" href="${urlCheckin}" target="_blank" rel="noopener noreferrer">
+          ${T("btnCheckin")}
+        </a>`;
+    }
   } else {
     bloqueCheckin = `
       <p class="checkin-listo">${T("checkinListo")}</p>`;
@@ -131,7 +170,29 @@ function mostrarReserva(r) {
       </div>
     </div>
   `;
+
+  // En la isla, genera el QR del check-in (y de los pagos si aplica).
+  if (window.generarQRsEn) generarQRsEn(resultado);
 }
+
+// En la isla de registro, convertimos los botones de reserva (Ayllu/Yachi)
+// en códigos QR para que el huésped reserve desde su celular.
+document.addEventListener("DOMContentLoaded", () => {
+  if (!window.ES_KIOSKO) return;
+  document.querySelectorAll(".boton-hostel").forEach((a) => {
+    const url = a.getAttribute("href");
+    const nombre = a.textContent.trim();
+    const div = document.createElement("div");
+    div.className = "qr-bloque";
+    div.innerHTML = `
+      <img class="qr qr-dinamico" data-qr="${url}" alt="QR ${nombre}" />
+      <p class="qr-texto"><strong>${nombre}</strong><br>
+        <span data-i18n="qrReservar">${T("qrReservar")}</span></p>`;
+    a.replaceWith(div);
+  });
+  const disp = document.querySelector(".disponibilidad");
+  if (disp && window.generarQRsEn) generarQRsEn(disp);
+});
 
 // ---- Pequeñas ayudas de formato ----
 
