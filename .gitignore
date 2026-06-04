@@ -9,6 +9,9 @@ node_modules/
 # Archivos de Vercel
 .vercel
 
+# Servidor de prueba local
+dev-server.mjs
+
 # Sistema
 .DS_Store
 Thumbs.db

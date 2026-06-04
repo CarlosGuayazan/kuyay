@@ -1,17 +1,18 @@
 /* ===== Estilos de la aplicación ===== */
 
 :root {
-  --color-principal: #1f6feb;
-  --color-principal-oscuro: #1a5fd0;
-  --color-fondo: #f4f6fb;
+  --color-principal: #ff8800; /* Naranja de marca Kuyay */
+  --color-principal-oscuro: #e5730a; /* Naranja más oscuro (hover) */
+  --color-acento: #ffd21f; /* Amarillo de marca */
+  --color-fondo: #fbf7f1; /* Crema cálido */
   --color-tarjeta: #ffffff;
-  --color-texto: #1c2333;
-  --color-texto-suave: #5b6577;
-  --color-borde: #dfe3ec;
+  --color-texto: #2a2118; /* Marrón muy oscuro */
+  --color-texto-suave: #7a6f63;
+  --color-borde: #ece3d8;
   --color-exito: #15803d;
   --color-error: #b42318;
   --radio: 14px;
-  --sombra: 0 10px 30px rgba(20, 30, 60, 0.08);
+  --sombra: 0 10px 30px rgba(120, 80, 20, 0.1);
 }
 
 * {
@@ -59,12 +60,22 @@ body {
 
 .hero {
   text-align: center;
-  padding: 32px 20px 24px;
+  padding: 24px 20px 24px;
+}
+
+.logo {
+  display: block;
+  width: 88px;
+  height: 88px;
+  border-radius: 22px;
+  margin: 0 auto 14px;
+  box-shadow: 0 8px 22px rgba(255, 136, 0, 0.35);
 }
 
 .hero h1 {
   margin: 0 0 8px;
-  font-size: 1.8rem;
+  font-size: 1.85rem;
+  color: var(--color-principal);
 }
 
 .hero p {
@@ -92,7 +103,7 @@ main {
   margin: 0 0 16px;
   font-size: 0.9rem;
   color: var(--color-texto-suave);
-  background: #eef4ff;
+  background: #fff3e0;
   border-radius: 10px;
   padding: 10px 12px;
 }
@@ -249,7 +260,7 @@ button:disabled {
   flex: 1;
   display: block;
   padding: 16px 12px;
-  background: #eef4ff;
+  background: #fff3e0;
   color: var(--color-principal);
   border: 2px solid var(--color-principal);
   border-radius: 10px;
