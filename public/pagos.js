@@ -4,6 +4,7 @@
 //  Si la reservación tiene saldo pendiente (Pagado < Total a pagar),
 //  mostramos botones de pago. Cada uno abre una ventana (modal) con
 //  sus instrucciones: Transferencia, Wompi, PayPal y Criptomonedas.
+//  Los textos vienen de i18n.js (multi-idioma).
 // =====================================================================
 
 (function () {
@@ -20,6 +21,9 @@
   const DESCUENTO_TRM = 300; // Se resta a la TRM para la tasa de compra.
   const RECARGO_WOMPI = 0.05; // 5% adicional con Wompi.
 
+  // Atajo para traducir.
+  const t = (clave, vars) => (window.I18N ? I18N.t(clave, vars) : clave);
+
   let reservaActual = null;
   let trmCache = null;
 
@@ -29,7 +33,7 @@
   overlay.className = "modal-overlay oculto";
   overlay.innerHTML = `
     <div class="modal-card">
-      <button type="button" class="modal-cerrar" aria-label="Cerrar">✕</button>
+      <button type="button" class="modal-cerrar" aria-label="X">✕</button>
       <div class="modal-contenido"></div>
     </div>`;
   document.body.appendChild(overlay);
@@ -44,9 +48,7 @@
     contenido.innerHTML = "";
   }
 
-  overlay
-    .querySelector(".modal-cerrar")
-    .addEventListener("click", cerrarModal);
+  overlay.querySelector(".modal-cerrar").addEventListener("click", cerrarModal);
   overlay.addEventListener("click", (e) => {
     if (e.target === overlay) cerrarModal();
   });
@@ -57,7 +59,6 @@
   }
 
   // ---- Función pública: arma la sección de pago para una reserva ----
-  // app.js la llama dentro de mostrarReserva(). Si no hay saldo, no muestra nada.
   window.construirSeccionPago = function (reserva) {
     reservaActual = reserva;
     const saldo = saldoPendiente(reserva);
@@ -65,13 +66,13 @@
 
     return `
       <div class="pagos">
-        <h3>💰 Saldo pendiente: ${formatearDinero(saldo)}</h3>
-        <p>Elige cómo deseas pagar:</p>
+        <h3>💰 ${t("pagSaldo")} ${formatearDinero(saldo)}</h3>
+        <p>${t("pagElige")}</p>
         <div class="botones-pago">
-          <button type="button" class="boton-pago" data-pago="transferencia">🏦 Transferencia</button>
-          <button type="button" class="boton-pago" data-pago="wompi">💳 Tarjeta · Wompi (+5%)</button>
-          <button type="button" class="boton-pago" data-pago="paypal">🅿️ PayPal</button>
-          <button type="button" class="boton-pago" data-pago="cripto">🪙 Criptomonedas</button>
+          <button type="button" class="boton-pago" data-pago="transferencia">${t("pagBtnTransfer")}</button>
+          <button type="button" class="boton-pago" data-pago="wompi">${t("pagBtnWompi")}</button>
+          <button type="button" class="boton-pago" data-pago="paypal">${t("pagBtnPaypal")}</button>
+          <button type="button" class="boton-pago" data-pago="cripto">${t("pagBtnCripto")}</button>
         </div>
       </div>`;
   };
@@ -89,10 +90,10 @@
     if (metodo === "transferencia") abrirModal(htmlTransferencia());
     else if (metodo === "wompi") abrirModal(htmlWompi());
     else if (metodo === "paypal") {
-      abrirModal(htmlCargando("🅿️ PayPal"));
+      abrirModal(htmlCargando(t("pagBtnPaypal")));
       mostrarConUSD("paypal");
     } else if (metodo === "cripto") {
-      abrirModal(htmlCargando("🪙 Criptomonedas"));
+      abrirModal(htmlCargando(t("pagBtnCripto")));
       mostrarConUSD("cripto");
     }
   });
@@ -103,21 +104,21 @@
   function htmlTransferencia() {
     const saldo = saldoPendiente(reservaActual);
     return `
-      <h2>🏦 Pago por transferencia</h2>
+      <h2>${t("trTitulo")}</h2>
       <p class="monto-grande">${formatearDinero(saldo)}</p>
       <div class="datos-pago">
-        <p>🔑 <strong>Llave Bre-B:</strong> @Guayazan512 (Bancolombia)</p>
-        <p>📱 <strong>Nequi:</strong> 321 6363732
-          <span class="a-nombre">A nombre de: Cindy Díaz</span></p>
-        <p>📱 <strong>Daviplata:</strong> 300 2696890
-          <span class="a-nombre">A nombre de: Carlos Guayazan</span></p>
-        <p>🏛️ <strong>Bancolombia Ahorros:</strong> 69957664822
+        <p>🔑 <strong>${t("trLlave")}</strong> @Guayazan512 (Bancolombia)</p>
+        <p>📱 <strong>${t("trNequi")}</strong> 321 6363732
+          <span class="a-nombre">${t("trANombre")} Cindy Díaz</span></p>
+        <p>📱 <strong>${t("trDaviplata")}</strong> 300 2696890
+          <span class="a-nombre">${t("trANombre")} Carlos Guayazan</span></p>
+        <p>🏛️ <strong>${t("trBancolombia")}</strong> 69957664822
           <span class="a-nombre">C.C 1136880512 · Carlos Guayazan</span></p>
       </div>
-      <p class="reporte-titulo">📲 Reporta tu pago enviando el comprobante por WhatsApp:</p>
-      <img class="qr" src="${QR_WHATSAPP}" alt="QR para reportar pago por WhatsApp" />
-      <a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">Reportar por WhatsApp</a>
-      <button type="button" class="boton-finalizar">Finalizar</button>`;
+      <p class="reporte-titulo">${t("trReporta")}</p>
+      <img class="qr" src="${QR_WHATSAPP}" alt="QR WhatsApp" />
+      <a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">${t("trBtnWhatsapp")}</a>
+      <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`;
   }
 
   // --- 2) Wompi (tarjeta, con 5% de recargo) ---
@@ -125,14 +126,14 @@
     const saldo = saldoPendiente(reservaActual);
     const conRecargo = Math.round(saldo * (1 + RECARGO_WOMPI));
     return `
-      <h2>💳 Pago con tarjeta (Wompi)</h2>
-      <p class="aviso-recargo">⚠️ Esta opción tiene un <strong>recargo del 5%</strong>.</p>
-      <p>Saldo: ${formatearDinero(saldo)}</p>
-      <p class="monto-grande">Total a pagar: ${formatearDinero(conRecargo)}</p>
-      <a class="boton-pago-accion" href="${WOMPI_LINK}" target="_blank" rel="noopener noreferrer">Pagar con Wompi</a>
-      <p class="reporte-titulo">o escanea este código QR:</p>
-      <img class="qr" src="${WOMPI_QR}" alt="Código QR de pago Wompi" />
-      <button type="button" class="boton-finalizar">Finalizar</button>`;
+      <h2>${t("woTitulo")}</h2>
+      <p class="aviso-recargo">${t("woRecargo")}</p>
+      <p>${t("woSaldo")} ${formatearDinero(saldo)}</p>
+      <p class="monto-grande">${t("woTotal")} ${formatearDinero(conRecargo)}</p>
+      <a class="boton-pago-accion" href="${WOMPI_LINK}" target="_blank" rel="noopener noreferrer">${t("woBtnPagar")}</a>
+      <p class="reporte-titulo">${t("woEscanea")}</p>
+      <img class="qr" src="${WOMPI_QR}" alt="QR Wompi" />
+      <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`;
   }
 
   // --- 3 y 4) PayPal y Criptomonedas (requieren el monto en USD) ---
@@ -144,41 +145,40 @@
       const usd = Math.ceil((saldo / tasa) * 100) / 100; // 2 decimales
 
       const notaTasa = `
-        <p class="nota-tasa">
-          Calculado con la TRM de hoy (${formatearDinero(trm)}) menos $300 =
-          tasa de ${formatearDinero(tasa)} por dólar.
-        </p>`;
+        <p class="nota-tasa">${t("notaTasa", {
+          trm: formatearDinero(trm),
+          tasa: formatearDinero(tasa),
+        })}</p>`;
 
       if (metodo === "paypal") {
         abrirModal(`
-          <h2>🅿️ Pago con PayPal</h2>
-          <p>Envía el pago a este usuario de PayPal:</p>
+          <h2>${t("ppTitulo")}</h2>
+          <p>${t("ppEnvia")}</p>
           <p class="monto-grande">${PAYPAL_USER}</p>
-          <p class="monto-grande">Monto: $${usd.toFixed(2)} USD</p>
+          <p class="monto-grande">${t("montoLbl")} $${usd.toFixed(2)} USD</p>
           ${notaTasa}
-          <p class="reporte-titulo">📲 Luego reporta tu pago enviando el comprobante por WhatsApp:</p>
-          <img class="qr" src="${QR_WHATSAPP}" alt="QR para reportar pago por WhatsApp" />
-          <a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">Reportar por WhatsApp</a>
-          <button type="button" class="boton-finalizar">Finalizar</button>`);
+          <p class="reporte-titulo">${t("ppReporta")}</p>
+          <img class="qr" src="${QR_WHATSAPP}" alt="QR WhatsApp" />
+          <a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">${t("trBtnWhatsapp")}</a>
+          <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`);
       } else {
         abrirModal(`
-          <h2>🪙 Pago con Criptomonedas</h2>
-          <p class="monto-grande">Monto: $${usd.toFixed(2)} USD</p>
+          <h2>${t("crTitulo")}</h2>
+          <p class="monto-grande">${t("montoLbl")} $${usd.toFixed(2)} USD</p>
           ${notaTasa}
-          <a class="boton-pago-accion" href="${CRIPTO_LINK}" target="_blank" rel="noopener noreferrer">Pagar con criptomonedas</a>
-          <button type="button" class="boton-finalizar">Finalizar</button>`);
+          <a class="boton-pago-accion" href="${CRIPTO_LINK}" target="_blank" rel="noopener noreferrer">${t("crBtnPagar")}</a>
+          <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`);
       }
     } catch (err) {
       abrirModal(`
-        <h2>${metodo === "paypal" ? "🅿️ PayPal" : "🪙 Criptomonedas"}</h2>
-        <p class="error-trm">No pudimos obtener la tasa del dólar en este momento.
-        Por favor intenta de nuevo en unos minutos.</p>
-        <button type="button" class="boton-finalizar">Cerrar</button>`);
+        <h2>${metodo === "paypal" ? t("ppTitulo") : t("crTitulo")}</h2>
+        <p class="error-trm">${t("errTRM")}</p>
+        <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`);
     }
   }
 
   function htmlCargando(titulo) {
-    return `<h2>${titulo}</h2><p>Calculando el monto en dólares con la TRM de hoy...</p>`;
+    return `<h2>${titulo}</h2><p>${t("calcCargando")}</p>`;
   }
 
   async function obtenerTRM() {

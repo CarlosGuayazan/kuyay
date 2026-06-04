@@ -64,13 +64,24 @@
         "{space} {enter}",
       ],
     },
-    display: {
-      "{bksp}": "⌫ Borrar",
-      "{enter}": "Listo ✓",
-      "{space}": "espacio",
-      "{shift}": "⇧ Mayús",
-    },
+    display: etiquetasIdioma(),
   });
+
+  // Textos de las teclas especiales, según el idioma actual.
+  function etiquetasIdioma() {
+    const t = (clave, alt) => (window.I18N ? I18N.t(clave) : alt);
+    return {
+      "{bksp}": t("kbBorrar", "⌫ Borrar"),
+      "{enter}": t("kbListo", "Listo ✓"),
+      "{space}": t("kbEspacio", "espacio"),
+      "{shift}": t("kbMayus", "⇧ Mayús"),
+    };
+  }
+
+  // Si el huésped cambia de idioma, actualizamos las teclas especiales.
+  if (window.I18N) {
+    I18N.onChange(() => teclado.setOptions({ display: etiquetasIdioma() }));
+  }
 
   function alternarMayusculas() {
     const actual = teclado.options.layoutName;

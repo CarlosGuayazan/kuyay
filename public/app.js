@@ -2,10 +2,19 @@
 //
 // Este código NO conoce tu clave secreta. Solo le habla a nuestro
 // intermediario seguro en /api/consultar, que es quien tiene la clave.
+// Los textos visibles vienen de i18n.js (multi-idioma).
 
 const formulario = document.getElementById("formulario");
 const resultado = document.getElementById("resultado");
 const botonBuscar = document.getElementById("botonBuscar");
+
+// Atajo para traducir (si i18n no cargara, muestra la clave).
+const T = (clave, vars) => (window.I18N ? I18N.t(clave, vars) : clave);
+const LOCALE = () => (window.I18N ? I18N.locale : "es-CO");
+
+// Guardamos la última reserva mostrada para volver a dibujarla
+// si el huésped cambia de idioma.
+let ultimaReserva = null;
 
 formulario.addEventListener("submit", async (evento) => {
   evento.preventDefault();
@@ -20,14 +29,15 @@ formulario.addEventListener("submit", async (evento) => {
 
   // Validación: al menos un dato.
   if (!datos.numeroReserva && !datos.email && !datos.nombre && !datos.telefono) {
-    mostrarMensaje("Por favor ingresa al menos un dato para buscar.", true);
+    ultimaReserva = null;
+    mostrarMensaje(T("msgValida"), true);
     return;
   }
 
   // Estado "cargando".
   botonBuscar.disabled = true;
-  botonBuscar.textContent = "Buscando...";
-  mostrarMensaje("Consultando tu reservación, un momento...");
+  botonBuscar.textContent = T("btnBuscando");
+  mostrarMensaje(T("msgCargando"));
 
   try {
     const respuesta = await fetch("/api/consultar", {
@@ -39,25 +49,30 @@ formulario.addEventListener("submit", async (evento) => {
     const json = await respuesta.json();
 
     if (json.error) {
+      ultimaReserva = null;
       mostrarMensaje(json.error, true);
     } else if (json.encontrada) {
+      ultimaReserva = json.reserva;
       mostrarReserva(json.reserva);
     } else {
-      mostrarMensaje(
-        json.mensaje || "No se encontró ninguna reservación.",
-        false
-      );
+      ultimaReserva = null;
+      mostrarMensaje(T("msgNoEncontrada"), false);
     }
   } catch (err) {
-    mostrarMensaje(
-      "Hubo un problema de conexión. Intenta de nuevo en unos segundos.",
-      true
-    );
+    ultimaReserva = null;
+    mostrarMensaje(T("msgConexion"), true);
   } finally {
     botonBuscar.disabled = false;
-    botonBuscar.textContent = "Buscar reservación";
+    botonBuscar.textContent = T("btnBuscar");
   }
 });
+
+// Si el huésped cambia de idioma, volvemos a dibujar la reserva mostrada.
+if (window.I18N) {
+  I18N.onChange(() => {
+    if (ultimaReserva) mostrarReserva(ultimaReserva);
+  });
+}
 
 // Muestra un mensaje simple (informativo o de error).
 function mostrarMensaje(texto, esError = false) {
@@ -75,7 +90,6 @@ function mostrarReserva(r) {
     .join(" ");
 
   // Si el check-in AÚN no está hecho, preparamos el botón para realizarlo.
-  // Construimos la URL con el número de reserva y el correo del huésped.
   let bloqueCheckin = "";
   if (!r.checked_in) {
     const urlCheckin =
@@ -85,33 +99,33 @@ function mostrarReserva(r) {
       "&lg=es";
     bloqueCheckin = `
       <a class="boton-checkin" href="${urlCheckin}" target="_blank" rel="noopener noreferrer">
-        ✅ Realizar mi check-in en línea
+        ${T("btnCheckin")}
       </a>`;
   } else {
     bloqueCheckin = `
-      <p class="checkin-listo">✔️ Tu check-in ya está realizado.</p>`;
+      <p class="checkin-listo">${T("checkinListo")}</p>`;
   }
 
   resultado.classList.remove("oculto");
   resultado.innerHTML = `
     <div class="tarjeta-reserva">
       <header>
-        <h2>Reservación #${escaparHtml(r.booking_id)}</h2>
-        <span>${escaparHtml(r.channel?.name || "Reserva directa")}</span>
+        <h2>${T("rcReserva")} #${escaparHtml(r.booking_id)}</h2>
+        <span>${escaparHtml(r.channel?.name || T("rcReservaDirecta"))}</span>
       </header>
       <div class="cuerpo-reserva">
-        ${fila("Huésped", nombreCompleto || "—")}
-        ${fila("Correo", huesped.email || "—")}
-        ${fila("Teléfono", huesped.phone || "—")}
-        ${fila("País", huesped.country || "—")}
-        ${fila("Habitación", `${r.assigned_room?.name || "—"} (${r.assigned_room?.type || "—"})`)}
-        ${fila("Entrada (check-in)", formatearFecha(r.start_date))}
-        ${fila("Salida (check-out)", formatearFecha(r.end_date))}
-        ${fila("Huéspedes", r.total_guests ?? "—")}
-        ${fila("Total a pagar", formatearDinero(r.total_to_pay))}
-        ${fila("Pagado", formatearDinero(r.paid_out))}
-        ${fila("Check-in realizado", estado(r.checked_in))}
-        ${fila("Check-out realizado", estado(r.checked_out))}
+        ${fila(T("rcHuesped"), nombreCompleto || "—")}
+        ${fila(T("rcCorreo"), huesped.email || "—")}
+        ${fila(T("rcTelefono"), huesped.phone || "—")}
+        ${fila(T("rcPais"), huesped.country || "—")}
+        ${fila(T("rcHabitacion"), `${r.assigned_room?.name || "—"} (${r.assigned_room?.type || "—"})`)}
+        ${fila(T("rcEntrada"), formatearFecha(r.start_date))}
+        ${fila(T("rcSalida"), formatearFecha(r.end_date))}
+        ${fila(T("rcHuespedes"), r.total_guests ?? "—")}
+        ${fila(T("rcTotal"), formatearDinero(r.total_to_pay))}
+        ${fila(T("rcPagado"), formatearDinero(r.paid_out))}
+        ${fila(T("rcCheckinReal"), estado(r.checked_in))}
+        ${fila(T("rcCheckoutReal"), estado(r.checked_out))}
         ${bloqueCheckin}
         ${typeof construirSeccionPago === "function" ? construirSeccionPago(r) : ""}
       </div>
@@ -131,15 +145,15 @@ function fila(etiqueta, valor) {
 
 function estado(valor) {
   return valor
-    ? `<span class="etiqueta-estado estado-si">Sí</span>`
-    : `<span class="etiqueta-estado estado-no">No</span>`;
+    ? `<span class="etiqueta-estado estado-si">${T("estadoSi")}</span>`
+    : `<span class="etiqueta-estado estado-no">${T("estadoNo")}</span>`;
 }
 
 function formatearFecha(fecha) {
   if (!fecha) return "—";
   try {
     const d = new Date(fecha + "T00:00:00");
-    return d.toLocaleDateString("es-CO", {
+    return d.toLocaleDateString(LOCALE(), {
       weekday: "long",
       year: "numeric",
       month: "long",
@@ -153,7 +167,7 @@ function formatearFecha(fecha) {
 function formatearDinero(monto) {
   if (monto === null || monto === undefined) return "—";
   try {
-    return new Intl.NumberFormat("es-CO", {
+    return new Intl.NumberFormat(LOCALE(), {
       style: "currency",
       currency: "COP",
       maximumFractionDigits: 0,

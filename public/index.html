@@ -12,59 +12,58 @@
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
+    <!-- Selector de idioma -->
+    <div id="selector-idioma" class="selector-idioma"></div>
+
     <header class="hero">
-      <h1>🏨 Consulta tu Reservación</h1>
-      <p>Ingresa uno de tus datos y te mostraremos tu reservación activa.</p>
+      <h1>🏨 <span data-i18n="heroTitle"></span></h1>
+      <p data-i18n="heroSubtitle"></p>
     </header>
 
     <main>
       <form id="formulario" class="tarjeta">
-        <p class="ayuda">
-          Para proteger tu privacidad, te recomendamos buscar con tu
-          <strong>número de reservación</strong> junto con tu
-          <strong>correo</strong>.
-        </p>
+        <p class="ayuda" data-i18n="formAyuda"></p>
 
-        <label for="numeroReserva">Número de reservación</label>
+        <label for="numeroReserva" data-i18n="lblNumero"></label>
         <input
           type="text"
           id="numeroReserva"
           name="numeroReserva"
-          placeholder="Ej: 20491561"
+          data-i18n-ph="phNumero"
           autocomplete="off"
         />
 
-        <label for="email">Correo electrónico</label>
+        <label for="email" data-i18n="lblEmail"></label>
         <input
           type="email"
           id="email"
           name="email"
-          placeholder="tucorreo@ejemplo.com"
+          data-i18n-ph="phEmail"
           autocomplete="off"
         />
 
         <details>
-          <summary>Más opciones de búsqueda</summary>
-          <label for="nombre">Nombre del titular</label>
+          <summary data-i18n="masOpciones"></summary>
+          <label for="nombre" data-i18n="lblNombre"></label>
           <input
             type="text"
             id="nombre"
             name="nombre"
-            placeholder="Ej: Isabel Guerra"
+            data-i18n-ph="phNombre"
             autocomplete="off"
           />
 
-          <label for="telefono">Teléfono</label>
+          <label for="telefono" data-i18n="lblTelefono"></label>
           <input
             type="text"
             id="telefono"
             name="telefono"
-            placeholder="Ej: +57 312 5772922"
+            data-i18n-ph="phTelefono"
             autocomplete="off"
           />
         </details>
 
-        <button type="submit" id="botonBuscar">Buscar reservación</button>
+        <button type="submit" id="botonBuscar" data-i18n="btnBuscar"></button>
       </form>
 
       <!-- Aquí aparecerá el resultado -->
@@ -72,10 +71,8 @@
 
       <!-- Consultar disponibilidad y reservar -->
       <section class="tarjeta disponibilidad">
-        <h2>📅 ¿Aún no tienes reserva?</h2>
-        <p class="ayuda">
-          Consulta disponibilidad y reserva en línea. Elige tu hostel:
-        </p>
+        <h2>📅 <span data-i18n="dispTitulo"></span></h2>
+        <p class="ayuda" data-i18n="dispAyuda"></p>
         <div class="botones-hostels">
           <a
             class="boton-hostel"
@@ -96,9 +93,11 @@
     </main>
 
     <footer>
-      <p>Hotel Kuyay · Sistema de consulta de reservaciones</p>
+      <p data-i18n="footer"></p>
     </footer>
 
+    <!-- Multi-idioma primero, para que el resto pueda usar I18N -->
+    <script src="i18n.js"></script>
     <script src="app.js"></script>
     <script src="pagos.js"></script>
     <!-- Librería del teclado en pantalla + nuestra lógica -->
