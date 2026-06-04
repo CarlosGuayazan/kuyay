@@ -12,7 +12,7 @@
   const QR_WHATSAPP =
     "https://kuyay.co/wp-content/uploads/2026/06/WhatsApp-Image-2026-06-03-at-20.02.31.jpeg";
   const WA_LINK =
-    "https://wa.me/573629639?text=Hola,%20he%20completado%20mi%20pago";
+    "https://wa.me/573193108212?text=Hola,%20he%20completado%20mi%20pago";
   const WOMPI_LINK = "https://checkout.wompi.co/l/VPOS_R9JSmA";
   const WOMPI_QR =
     "https://kuyay.co/wp-content/uploads/2026/06/chekout-wompiqr-code.png";
