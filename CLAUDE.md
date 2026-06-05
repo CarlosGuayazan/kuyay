@@ -19,8 +19,7 @@ conviene **previsualizar los cambios** antes de subirlos.
 
 - **GitHub:** https://github.com/CarlosGuayazan/kuyay  (rama principal: `main`)
 - **Carpeta local:** `C:\Users\SOPORTE\kuyay-reservaciones`
-- **Producción (Vercel):** ⚠️ CONFIRMAR — probablemente `https://cheking.kuyay.co`
-  (dominio propio) y/o el dominio `*.vercel.app` del proyecto.
+- **Producción (Vercel):** **https://cheking.kuyay.co** (dominio propio).
 - **Despliegue:** Vercel está conectado a GitHub → **cada `git push` a `main`
   re-publica solo** en ~1 minuto.
 
@@ -113,7 +112,7 @@ reporte a Dapta.
 - Confirmar que en **Vercel** estén las 7 variables de entorno y hacer Redeploy.
 - El **módulo de efectivo** del kiosko debe estar encendido (el `/health` dio
   502 cuando estaba apagado).
-- Confirmar la **URL de producción** real (arriba).
+- Producción confirmada en **https://cheking.kuyay.co**.
 
 ## Flujo para hacer cambios
 
