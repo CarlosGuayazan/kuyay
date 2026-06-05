@@ -545,6 +545,33 @@ footer {
   text-align: center;
 }
 
+.ef-texto {
+  text-align: center;
+  color: var(--color-texto-suave);
+}
+
+.ef-estado {
+  text-align: center;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.spinner {
+  width: 46px;
+  height: 46px;
+  margin: 18px auto;
+  border: 5px solid var(--color-borde);
+  border-top-color: var(--color-principal);
+  border-radius: 50%;
+  animation: girar 0.9s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* En pantallas pequeñas, los botones de pago se apilan. */
 @media (max-width: 460px) {
   .botones-pago {

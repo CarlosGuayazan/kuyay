@@ -55,6 +55,7 @@
       ? ""
       : `<a class="boton-whatsapp" href="${WA_LINK}" target="_blank" rel="noopener noreferrer">${t("trBtnWhatsapp")}</a>`;
   function cerrarModal() {
+    detenerPoll();
     overlay.classList.add("oculto");
     contenido.innerHTML = "";
   }
@@ -80,6 +81,11 @@
         <h3>💰 ${t("pagSaldo")} ${formatearDinero(saldo)}</h3>
         <p>${t("pagElige")}</p>
         <div class="botones-pago">
+          ${
+            esKiosko()
+              ? `<button type="button" class="boton-pago" data-pago="efectivo">${t("pagBtnEfectivo")}</button>`
+              : ""
+          }
           <button type="button" class="boton-pago" data-pago="transferencia">${t("pagBtnTransfer")}</button>
           <button type="button" class="boton-pago" data-pago="wompi">${t("pagBtnWompi")}</button>
           <button type="button" class="boton-pago" data-pago="paypal">${t("pagBtnPaypal")}</button>
@@ -90,6 +96,11 @@
 
   // ---- Clics: abrir el modal según la opción elegida ----
   document.addEventListener("click", (e) => {
+    if (e.target.closest("[data-ef-cancelar]")) {
+      cancelarEfectivo();
+      cerrarModal();
+      return;
+    }
     if (e.target.closest(".boton-finalizar")) {
       cerrarModal();
       return;
@@ -98,7 +109,8 @@
     if (!btn) return;
 
     const metodo = btn.dataset.pago;
-    if (metodo === "transferencia") abrirModal(htmlTransferencia());
+    if (metodo === "efectivo") iniciarEfectivo();
+    else if (metodo === "transferencia") abrirModal(htmlTransferencia());
     else if (metodo === "wompi") abrirModal(htmlWompi());
     else if (metodo === "paypal") {
       abrirModal(htmlCargando(t("pagBtnPaypal")));
@@ -110,6 +122,117 @@
   });
 
   // ===================== Contenido de cada opción =====================
+
+  // --- 0) Efectivo (solo en la isla/kiosko) ---
+  // Se conecta con la máquina de efectivo del kiosko mediante nuestros
+  // intermediarios seguros: /api/efectivo (iniciar), /api/efectivo-estado
+  // (consultar) y /api/efectivo-cancelar (cancelar).
+  let efPollTimer = null;
+
+  function detenerPoll() {
+    if (efPollTimer) {
+      clearInterval(efPollTimer);
+      efPollTimer = null;
+    }
+  }
+
+  async function iniciarEfectivo() {
+    abrirModal(`
+      <h2>${t("efTitulo")}</h2>
+      <p class="ef-estado">${t("efIniciando")}</p>
+      <div class="spinner"></div>`);
+
+    const saldo = saldoPendiente(reservaActual);
+    const reference = "booking-" + reservaActual.booking_id;
+
+    try {
+      const r = await fetch("/api/efectivo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reference, amount: saldo }),
+      });
+      if (r.status === 409) return efMensaje(t("efOcupado"));
+      const data = await r.json().catch(() => ({}));
+      if (!r.ok || !(data && data.ok)) return efMensaje(t("efError"));
+      const pago = data.payment || {};
+      efCobrando(pago.collected || 0, saldo);
+      iniciarPoll(saldo);
+    } catch (e) {
+      efMensaje(t("efError"));
+    }
+  }
+
+  function efCobrando(collected, saldo) {
+    abrirModal(`
+      <h2>${t("efTitulo")}</h2>
+      <p class="ef-estado">${t("efInserta")}</p>
+      <p class="monto-grande" id="ef-recibido">${t("efRecibido")}: ${formatearDinero(
+        collected
+      )} / ${formatearDinero(saldo)}</p>
+      <p class="ef-texto">${t("efCambioNota")}</p>
+      <button type="button" class="boton-finalizar" data-ef-cancelar="1">${t("efCancelar")}</button>`);
+  }
+
+  function iniciarPoll(saldo) {
+    detenerPoll();
+    efPollTimer = setInterval(async () => {
+      try {
+        const r = await fetch("/api/efectivo-estado");
+        const data = await r.json().catch(() => ({}));
+        const pago = (data && data.payment) || data;
+        if (!pago || !pago.status) return;
+
+        if (pago.status === "collecting") {
+          const el = document.getElementById("ef-recibido");
+          if (el) {
+            el.textContent = `${t("efRecibido")}: ${formatearDinero(
+              pago.collected || 0
+            )} / ${formatearDinero(saldo)}`;
+          }
+        } else if (
+          pago.status === "completed" ||
+          pago.status === "completed_with_shortfall"
+        ) {
+          detenerPoll();
+          efCompletado(pago);
+        } else if (pago.status === "cancelled") {
+          detenerPoll();
+          efMensaje(t("efCancelado"));
+        }
+      } catch (e) {}
+    }, 2000);
+  }
+
+  function efCompletado(pago) {
+    const cambio = pago.change || 0;
+    const faltante = pago.changeShortfall || 0;
+    let html = `
+      <h2>${t("efPagado")}</h2>
+      <p class="monto-grande">${t("efRecibido")}: ${formatearDinero(
+        pago.collected || 0
+      )}</p>`;
+    if (cambio > 0)
+      html += `<p class="ef-texto">${t("efCambio")}: ${formatearDinero(cambio)}</p>`;
+    if (faltante > 0)
+      html += `<p class="aviso-recargo">${t("efFaltante")}: ${formatearDinero(
+        faltante
+      )}</p>`;
+    html += `<button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`;
+    abrirModal(html);
+  }
+
+  function efMensaje(msg) {
+    detenerPoll();
+    abrirModal(`
+      <h2>${t("efTitulo")}</h2>
+      <p class="ef-texto">${msg}</p>
+      <button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`);
+  }
+
+  function cancelarEfectivo() {
+    detenerPoll();
+    fetch("/api/efectivo-cancelar", { method: "POST" }).catch(() => {});
+  }
 
   // --- 1) Transferencia ---
   function htmlTransferencia() {
