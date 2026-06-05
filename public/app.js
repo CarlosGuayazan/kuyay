@@ -103,6 +103,16 @@ if (window.I18N) {
   });
 }
 
+// Marca la reserva mostrada como pagada en ESTA sesión (tras un pago en
+// efectivo confirmado): pone "Pagado" igual al total y quita las opciones de
+// pago. La base de datos real se actualiza unos minutos después por el reporte.
+window.marcarReservaPagada = function () {
+  if (ultimaReserva) {
+    ultimaReserva.paid_out = ultimaReserva.total_to_pay;
+    mostrarReserva(ultimaReserva);
+  }
+};
+
 // Muestra un mensaje simple (informativo o de error).
 function mostrarMensaje(texto, esError = false) {
   resultado.classList.remove("oculto");

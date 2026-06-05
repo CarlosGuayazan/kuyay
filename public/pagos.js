@@ -204,6 +204,15 @@
   }
 
   function efCompletado(pago) {
+    // 1) Capturamos los datos del reporte ANTES de marcar la reserva como pagada.
+    const datosReporte = construirReporte(pago);
+
+    // 2) Marcamos la reserva como pagada en esta sesión: actualiza "Pagado" y
+    //    quita todos los métodos de pago. La base de datos real se actualiza en
+    //    unos minutos gracias al reporte de pago.
+    if (window.marcarReservaPagada) window.marcarReservaPagada();
+
+    // 3) Mostramos el resultado al huésped.
     const cambio = pago.change || 0;
     const faltante = pago.changeShortfall || 0;
     let html = `
@@ -219,6 +228,38 @@
       )}</p>`;
     html += `<button type="button" class="boton-finalizar">${t("btnFinalizar")}</button>`;
     abrirModal(html);
+
+    // 4) Reportamos el pago a la base de datos (en segundo plano).
+    enviarReporte(datosReporte);
+  }
+
+  // Arma el cuerpo del reporte de pago a partir de la reserva y el resultado.
+  function construirReporte(pago) {
+    const h = reservaActual.holder || {};
+    const nombre = [h.name, h.surname, h.second_surname]
+      .filter(Boolean)
+      .join(" ");
+    const saldoPrevio = saldoPendiente(reservaActual);
+    const pagado = pago.amount || saldoPrevio;
+    const due = Math.max(0, saldoPrevio - pagado);
+    return {
+      guest_name: nombre,
+      amount_Paid: String(pagado),
+      "reservation-value": String(reservaActual.total_to_pay || ""),
+      "due-balance": String(due),
+      "date-time": pago.completedAt || new Date().toISOString(),
+      "reservation-id": String(reservaActual.booking_id || ""),
+      room:
+        (reservaActual.assigned_room && reservaActual.assigned_room.name) || "",
+    };
+  }
+
+  function enviarReporte(datos) {
+    fetch("/api/reportar-pago", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+    }).catch(() => {});
   }
 
   function efMensaje(msg) {
