@@ -352,21 +352,48 @@ footer {
 /* ===== Sección de pagos ===== */
 
 .pagos {
-  margin-top: 20px;
-  padding-top: 18px;
-  border-top: 2px dashed var(--color-borde);
+  margin-top: 22px;
+  padding: 18px;
+  border: 2px solid var(--color-principal);
+  border-radius: var(--radio);
+  background: #fff7ed; /* Naranja muy claro: destaca el pago como acción principal */
 }
 
-.pagos h3 {
-  margin: 0 0 4px;
+.pagos-encabezado {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 2px 12px;
+}
+
+.pagos-titulo {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--color-texto);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.pagos-monto {
+  margin: 0;
+  font-size: 1.9rem;
+  font-weight: 800;
+  line-height: 1.1;
   color: var(--color-error);
+}
+
+.pagos-elige {
+  margin: 8px 0 0;
+  color: var(--color-texto-suave);
 }
 
 .botones-pago {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .boton-pago {

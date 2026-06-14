@@ -78,8 +78,11 @@
 
     return `
       <div class="pagos">
-        <h3>💰 ${t("pagSaldo")} ${formatearDinero(saldo)}</h3>
-        <p>${t("pagElige")}</p>
+        <div class="pagos-encabezado">
+          <h3 class="pagos-titulo">💰 ${t("pagSaldo")}</h3>
+          <p class="pagos-monto">${formatearDinero(saldo)}</p>
+        </div>
+        <p class="pagos-elige">${t("pagElige")}</p>
         <div class="botones-pago">
           ${
             esKiosko()
