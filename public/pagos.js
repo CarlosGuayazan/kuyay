@@ -240,8 +240,23 @@
       .filter(Boolean)
       .join(" ");
     const saldoPrevio = saldoPendiente(reservaActual);
-    const pagado = pago.amount || saldoPrevio;
-    const due = Math.max(0, saldoPrevio - pagado);
+
+    // Datos que reporta la máquina de efectivo:
+    //   collected       = efectivo que metió el huésped
+    //   change          = cambio que la máquina devolvió (solo billetes de $5.000)
+    //   changeShortfall = cambio que NO se pudo devolver (sobrante < $5.000)
+    const recibido = Number(pago.collected) || 0;
+    const cambio = Number(pago.change) || 0;
+    const faltante = Number(pago.changeShortfall) || 0;
+
+    // Lo que el huésped REALMENTE pagó = lo que metió − el cambio que recibió.
+    // (Si por algún motivo no llega "collected", caemos al monto cobrado.)
+    const pagado =
+      recibido > 0 ? recibido - cambio : Number(pago.amount) || saldoPrevio;
+
+    // Saldo a conciliar = el cambio que la máquina no pudo devolver.
+    // Es dinero que se le sigue debiendo al huésped (sobrante de billetes).
+    const due = faltante;
     return {
       guest_name: nombre,
       amount_Paid: String(pagado),
