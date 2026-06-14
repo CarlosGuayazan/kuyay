@@ -167,8 +167,8 @@ function mostrarReserva(r) {
         ${fila(T("rcPagado"), formatearDinero(r.paid_out))}
         ${fila(T("rcCheckinReal"), estado(r.checked_in))}
         ${fila(T("rcCheckoutReal"), estado(r.checked_out))}
-        ${bloqueCheckin}
         ${typeof construirSeccionPago === "function" ? construirSeccionPago(r) : ""}
+        ${bloqueCheckin}
       </div>
     </div>
   `;
@@ -247,4 +247,35 @@ function escaparHtml(texto) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+// ---- Auto-recarga del kiosko cuando se publica una versión nueva ----
+// La isla deja la página abierta 24/7, así que un despliegue no se ve hasta
+// recargar. Solo en modo kiosko: consultamos /api/version cada minuto y, si
+// cambió, recargamos. Pero NUNCA en medio de un registro o pago: si hay un
+// modal abierto o el huésped está escribiendo, esperamos al siguiente chequeo.
+if (window.ES_KIOSKO) {
+  let versionActual = null;
+  setInterval(async () => {
+    try {
+      const r = await fetch("/api/version", { cache: "no-store" });
+      const { version } = await r.json();
+      if (!version) return;
+      if (versionActual === null) {
+        versionActual = version; // Primera lectura: guardamos la versión base.
+        return;
+      }
+      if (version === versionActual) return;
+
+      // Hay versión nueva. ¿El huésped está usando la pantalla? Si sí, esperamos.
+      const modalAbierto = document.querySelector("#modal-pago:not(.oculto)");
+      const escribiendo =
+        document.activeElement &&
+        document.activeElement.matches &&
+        document.activeElement.matches("input, textarea");
+      if (modalAbierto || escribiendo) return;
+
+      location.reload();
+    } catch (_) {}
+  }, 60000);
 }
