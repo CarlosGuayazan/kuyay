@@ -45,48 +45,64 @@ export default async function handler(req, res) {
   }
 
   const informacion = partes.join(", ");
+  const url = `${baseUrl}?x-api-key=${encodeURIComponent(apiKey)}`;
+
+  // Dapta es un agente de IA: a veces devuelve el JSON de la reserva y a veces
+  // un texto de "razonamiento" que no es JSON. Por eso reintentamos hasta 3
+  // veces cuando la respuesta no es una reserva válida.
+  const MAX_INTENTOS = 3;
+  let ultimoTexto = "";
 
   try {
-    // Llamamos a tu webhook de Dapta, agregando la clave secreta.
-    const url = `${baseUrl}?x-api-key=${encodeURIComponent(apiKey)}`;
+    for (let intento = 1; intento <= MAX_INTENTOS; intento++) {
+      const respuesta = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ informacion }),
+      });
 
-    const respuesta = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ informacion }),
-    });
+      const data = await respuesta.json();
 
-    const data = await respuesta.json();
+      // Dapta responde un arreglo; el ÚLTIMO elemento trae el resultado final
+      // (los anteriores son el "razonamiento" del agente, que ignoramos).
+      let textoResultado = "";
+      if (Array.isArray(data) && data.length > 0) {
+        textoResultado = data[data.length - 1].text || "";
+      } else if (data && typeof data.text === "string") {
+        textoResultado = data.text;
+      }
+      ultimoTexto = textoResultado;
 
-    // Dapta responde un arreglo; el ÚLTIMO elemento trae el resultado final
-    // (los anteriores son el "razonamiento" del agente, que ignoramos).
-    let textoResultado = "";
-    if (Array.isArray(data) && data.length > 0) {
-      textoResultado = data[data.length - 1].text || "";
-    } else if (data && typeof data.text === "string") {
-      textoResultado = data.text;
+      // Intentamos interpretar el resultado como JSON (la reservación).
+      let reserva = null;
+      try {
+        reserva = JSON.parse(textoResultado);
+      } catch (_) {
+        reserva = null;
+      }
+
+      console.log(
+        `[consultar] intento ${intento}/${MAX_INTENTOS} | buscar: "${informacion}" | ` +
+          (reserva && reserva.booking_id
+            ? `OK booking_id=${reserva.booking_id}`
+            : `sin reserva | respuesta: ${textoResultado.slice(0, 300)}`)
+      );
+
+      if (reserva && reserva.booking_id) {
+        return res.status(200).json({ encontrada: true, reserva });
+      }
+      // Si no fue una reserva válida, reintentamos (salvo en el último intento).
     }
 
-    // Intentamos interpretar el resultado como JSON (la reservación).
-    let reserva = null;
-    try {
-      reserva = JSON.parse(textoResultado);
-    } catch (_) {
-      reserva = null;
-    }
-
-    if (reserva && reserva.booking_id) {
-      return res.status(200).json({ encontrada: true, reserva });
-    }
-
-    // Si no es un JSON válido, fue el "no se encontró" u otro mensaje.
+    // Agotamos los reintentos sin obtener una reserva válida.
     return res.status(200).json({
       encontrada: false,
       mensaje:
-        textoResultado ||
+        ultimoTexto ||
         "No se encontró ninguna reservación con los datos proporcionados.",
     });
   } catch (err) {
+    console.error("[consultar] error al consultar Dapta:", err && err.message);
     return res
       .status(502)
       .json({ error: "Error al consultar el servicio de reservaciones." });
