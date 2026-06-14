@@ -55,6 +55,9 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: "Firma inválida." });
   }
 
+  // Log del resultado completo y firmado (la fuente confiable de la máquina).
+  console.log("[efectivo-webhook] resultado firmado:", raw);
+
   // Firma válida: el resultado es confiable.
   // El kiosko es la fuente de verdad (el navegador consulta el estado),
   // así que aquí solo confirmamos la recepción (2xx) para que no reintente.
