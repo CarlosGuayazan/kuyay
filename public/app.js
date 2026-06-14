@@ -13,18 +13,10 @@ const T = (clave, vars) => (window.I18N ? I18N.t(clave, vars) : clave);
 const LOCALE = () => (window.I18N ? I18N.locale : "es-CO");
 
 // ¿Estamos en la isla de registro (kiosko)? Lo usan también pagos.js y teclado.js.
-// Es kiosko si la URL trae ?kiosko=1, o si es una computadora con pantalla táctil.
-window.ES_KIOSKO = (function () {
-  const ua = navigator.userAgent || "";
-  const esMovilOTablet =
-    /Android|iPhone|iPad|iPod|Mobile|Tablet|Silk|Kindle|PlayBook|BlackBerry|Opera Mini|IEMobile/i.test(
-      ua
-    );
-  const tienePantallaTactil =
-    (navigator.maxTouchPoints || 0) > 0 || "ontouchstart" in window;
-  const forzadoPorUrl = new URLSearchParams(location.search).has("kiosko");
-  return forzadoPorUrl || (!esMovilOTablet && tienePantallaTactil);
-})();
+// Es kiosko SOLO si la URL trae ?kiosko (ej: la dirección fija de la isla,
+// https://cheking.kuyay.co/?kiosko=1). En la versión normal (celular/PC, incluso
+// PC con pantalla táctil) NO se muestran teclado en pantalla, QR ni efectivo.
+window.ES_KIOSKO = new URLSearchParams(location.search).has("kiosko");
 
 // Genera los códigos QR dentro de un contenedor (busca <img data-qr="URL">).
 // Se hace en el navegador, sin enviar la URL a ningún servicio externo.
