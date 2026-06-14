@@ -22,6 +22,9 @@ export default async function handler(req, res) {
 
   const datos = req.body || {};
 
+  // Log para revisar en Vercel (Observability → Logs) lo que se reporta.
+  console.log("[reportar-pago] enviando a Dapta:", JSON.stringify(datos));
+
   try {
     const r = await fetch(`${url}?x-api-key=${encodeURIComponent(apiKey)}`, {
       method: "POST",
@@ -29,8 +32,14 @@ export default async function handler(req, res) {
       body: JSON.stringify(datos),
     });
     const data = await r.json().catch(() => ({}));
+    console.log(
+      "[reportar-pago] respuesta Dapta:",
+      r.status,
+      JSON.stringify(data)
+    );
     return res.status(r.status).json({ ok: r.ok, data });
   } catch (err) {
+    console.error("[reportar-pago] error al reportar:", err && err.message);
     return res.status(502).json({ error: "No se pudo reportar el pago." });
   }
 }
