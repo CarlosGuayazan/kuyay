@@ -118,6 +118,11 @@ Transferencia, Wompi (+5%), PayPal, Criptomonedas, y **Efectivo (solo kiosko,
 sin recargo)**. Enlaces de reserva: Ayllu → `reservasayllu.kuyay.co`, Yachi →
 `reservasyachi.kuyay.co`.
 
+**Orden en la tarjeta de reserva** (`public/app.js`, `mostrarReserva`): primero
+el **saldo pendiente y las opciones de pago** (resaltado en una caja naranja),
+y **después** el botón de check-in. La idea es que el huésped **pague primero y
+luego complete su registro**.
+
 ## Estado actual (al 2026-06-14)
 
 ✅ Completo y en producción: consulta, check-in, disponibilidad, teclado kiosko,
@@ -135,21 +140,19 @@ reporte a Dapta.
 - Confirmar que en **Vercel** estén las 7 variables de entorno y hacer Redeploy.
 - El **módulo de efectivo** del kiosko debe estar encendido (el `/health` dio
   502 cuando estaba apagado).
-- (Opcional) Limpiar logs de diagnóstico ruidosos (`[efectivo-estado]`).
-- (Opcional) Auto-recarga del kiosko al detectar versión nueva (ver abajo).
-
 ## ⚠️ Cosas importantes que aprendimos (para retomar sin tropezar)
 
-1. **Recargar el kiosko tras cada deploy.** El kiosko deja la página abierta;
-   un `git push` NO se ve hasta **recargar la página** (`Ctrl + Shift + R`).
-   Las cabeceras de Vercel ya revalidan (`max-age=0, must-revalidate`), el
-   problema es la pestaña abierta con el JS viejo en memoria. (Esto causó un
-   "falso bug" el 2026-06-14: el reporte salía con valores viejos.)
+1. **Recargar el kiosko tras cada deploy** (PC/celular se recargan a mano). El
+   kiosko deja la página abierta; un `git push` no se ve hasta recargar. **Ya
+   está automatizado:** en modo kiosko, el navegador consulta `/api/version`
+   cada minuto y, si cambió, se recarga solo (nunca en medio de un pago o
+   mientras el huésped escribe). Endpoint: `api/version.js`; lógica al final de
+   `public/app.js`. (El "falso bug" del 2026-06-14 fue por esto: el reporte
+   salía con valores viejos porque el kiosko corría JS cacheado.)
 2. **Logs de diagnóstico en Vercel** (Observability → Logs). Útiles para depurar:
    - `[consultar]` — cada intento de búsqueda y qué devolvió Dapta.
    - `[reportar-pago]` — el JSON enviado a Dapta y su respuesta.
    - `[efectivo-webhook]` — el resultado completo y FIRMADO de la máquina (fuente confiable).
-   - `[efectivo-estado]` — el snapshot del polling al completarse el pago.
 3. **Dos fuentes de datos del pago en efectivo:** el **webhook firmado**
    (`api/efectivo-webhook.js`) y el **polling** (`api/efectivo-estado.js` →
    `GET /api/payments/current`). Ambos traen `collected`/`change`/`changeShortfall`.
