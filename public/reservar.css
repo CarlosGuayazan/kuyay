@@ -72,8 +72,9 @@
 .rsv-desc { font-size: 0.85rem; color: #444; }
 .rsv-precio { font-weight: 800; color: #222; margin-top: 4px; }
 .rsv-precio small { font-weight: 500; color: #777; }
-.rsv-fila { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
-.rsv-fila select { flex: 1; padding: 9px; border: 1px solid #ccc; border-radius: 8px; }
+.rsv-fila { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.rsv-fila select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; }
+.rsv-fila .rsv-boton { width: 100%; }
 
 /* Modal genérico (galería y formulario) */
 .rsv-modal {
