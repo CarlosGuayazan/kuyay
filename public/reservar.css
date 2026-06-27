@@ -1,0 +1,118 @@
+/* ===== Módulo de reservas (disponibilidad nativa) ===== */
+.rsv-buscador {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+.rsv-campo {
+  display: flex;
+  flex-direction: column;
+  font-size: 0.85rem;
+  color: #555;
+}
+.rsv-campo input,
+.rsv-campo select {
+  margin-top: 4px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+.rsv-boton {
+  background: #ff8800;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 1rem;
+  cursor: pointer;
+}
+.rsv-boton:disabled { opacity: 0.6; cursor: default; }
+.rsv-boton.secundario { background: #6b7280; }
+.rsv-estado { text-align: center; color: #777; padding: 10px; }
+
+.rsv-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+}
+@media (min-width: 640px) { .rsv-grid { grid-template-columns: 1fr 1fr; } }
+
+.rsv-card {
+  border: 1px solid #eee;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+}
+.rsv-foto {
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  cursor: pointer;
+  background: #f2f2f2;
+}
+.rsv-card-body { padding: 12px; display: flex; flex-direction: column; gap: 6px; flex: 1; }
+.rsv-sede {
+  align-self: flex-start;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #ff8800;
+  background: #fff3e0;
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+.rsv-titulo { font-size: 1.15rem; font-weight: 800; margin: 0; }
+.rsv-tipo { font-size: 0.8rem; color: #666; }
+.rsv-desc { font-size: 0.85rem; color: #444; }
+.rsv-precio { font-weight: 800; color: #222; margin-top: 4px; }
+.rsv-precio small { font-weight: 500; color: #777; }
+.rsv-fila { display: flex; gap: 8px; align-items: center; margin-top: 8px; }
+.rsv-fila select { flex: 1; padding: 9px; border: 1px solid #ccc; border-radius: 8px; }
+
+/* Modal genérico (galería y formulario) */
+.rsv-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  z-index: 1000;
+}
+.rsv-modal.abierto { display: flex; }
+.rsv-modal-card {
+  background: #fff;
+  border-radius: 14px;
+  max-width: 460px;
+  width: 100%;
+  max-height: 92vh;
+  overflow-y: auto;
+  padding: 16px;
+}
+.rsv-modal-foto { width: 100%; border-radius: 10px; margin-bottom: 8px; }
+.rsv-form label { display: block; font-size: 0.85rem; color: #555; margin-top: 10px; }
+.rsv-form input,
+.rsv-form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-top: 4px;
+}
+.rsv-error { color: #c0262e; font-weight: 600; font-size: 0.85rem; margin-top: 8px; }
+.rsv-ok {
+  background: #e7f6e7;
+  color: #1d6b1d;
+  border-radius: 10px;
+  padding: 12px;
+  font-weight: 600;
+  text-align: center;
+}
