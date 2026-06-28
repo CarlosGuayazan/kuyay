@@ -288,11 +288,34 @@
       });
       const data = await r.json();
       if (!r.ok || !data.ok) throw new Error(data.error || T("errorReserva"));
-      abrirModal(`
-        <div class="rsv-ok">${T("okTitulo")}<br>${T("okCodigo")}: <strong>${esc(data.booking_id || "—")}</strong></div>
-        <p class="rsv-desc" style="margin-top:10px">${T("okTexto")}</p>
-        <button class="rsv-boton" style="width:100%;margin-top:12px" id="rsv-fin">${T("listo")}</button>`);
-      $("#rsv-fin").addEventListener("click", cerrarModal);
+
+      // Mostrar la reserva recién creada en la MISMA tarjeta (datos + check-in
+      // + medios de pago), como si la hubiera consultado.
+      let mostrada = false;
+      if (data.booking_id && window.kuyaySetReserva) {
+        try {
+          const lr = await fetch(`${API}/api/book/lookup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ numeroReserva: String(data.booking_id) }),
+          });
+          const ld = await lr.json();
+          if (ld.encontrada && ld.reserva) {
+            cerrarModal();
+            window.kuyaySetReserva(ld.reserva);
+            mostrada = true;
+          }
+        } catch (e) {
+          /* si falla la consulta, mostramos el mensaje simple abajo */
+        }
+      }
+      if (!mostrada) {
+        abrirModal(`
+          <div class="rsv-ok">${T("okTitulo")}<br>${T("okCodigo")}: <strong>${esc(data.booking_id || "—")}</strong></div>
+          <p class="rsv-desc" style="margin-top:10px">${T("okTexto")}</p>
+          <button class="rsv-boton" style="width:100%;margin-top:12px" id="rsv-fin">${T("listo")}</button>`);
+        $("#rsv-fin").addEventListener("click", cerrarModal);
+      }
     } catch (e) {
       btn.disabled = false;
       btn.textContent = T("confirmar");

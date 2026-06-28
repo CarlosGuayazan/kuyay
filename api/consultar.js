@@ -15,20 +15,40 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: "Método no permitido. Usa POST." });
   }
 
-  // Leemos la configuración secreta desde las Variables de Entorno.
-  // (Las configurarás en Vercel; nunca van dentro del código.)
+  // Vercel ya entrega el body como objeto JSON en req.body.
+  const { nombre, telefono, numeroReserva, email } = req.body || {};
+
+  // 1) CONSULTA DIRECTA A LOBBYPMS (vía nuestra API del VPS). Determinística.
+  //    Si encuentra la reserva, respondemos de inmediato.
+  if (numeroReserva || email || nombre || telefono) {
+    try {
+      const LOOKUP_URL =
+        process.env.LOOKUP_URL || "https://limpieza.kuyay.co/api/book/lookup";
+      const lr = await fetch(LOOKUP_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ numeroReserva, email, nombre, telefono }),
+      });
+      if (lr.ok) {
+        const ld = await lr.json();
+        if (ld && ld.encontrada && ld.reserva) {
+          console.log(`[consultar] LobbyPMS directo OK booking_id=${ld.reserva.booking_id}`);
+          return res.status(200).json({ encontrada: true, reserva: ld.reserva });
+        }
+      }
+    } catch (e) {
+      console.error("[consultar] lookup directo falló, uso Dapta:", e && e.message);
+    }
+  }
+
+  // 2) RESPALDO: Dapta (agente de IA). Solo si lo de arriba no encontró nada.
   const apiKey = process.env.DAPTA_API_KEY;
   const baseUrl = process.env.DAPTA_URL;
 
   if (!apiKey || !baseUrl) {
-    return res.status(500).json({
-      error:
-        "Falta configuración del servidor. Define DAPTA_API_KEY y DAPTA_URL en Vercel.",
-    });
+    // Sin Dapta configurado: devolvemos "no encontrada" (no es un error fatal).
+    return res.status(200).json({ encontrada: false });
   }
-
-  // Vercel ya entrega el body como objeto JSON en req.body.
-  const { nombre, telefono, numeroReserva, email } = req.body || {};
 
   // Construimos el texto que tu webhook espera dentro de "informacion".
   // Solo agregamos los datos que el usuario realmente escribió.

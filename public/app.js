@@ -105,6 +105,17 @@ window.marcarReservaPagada = function () {
   }
 };
 
+// Permite que otros módulos (p.ej. el de reservas) muestren una reserva en la
+// misma tarjeta, dejándola sincronizada con pagos y cambio de idioma.
+window.kuyaySetReserva = function (reserva) {
+  if (!reserva) return;
+  ultimaReserva = reserva;
+  mostrarReserva(reserva);
+  if (resultado && resultado.scrollIntoView) {
+    resultado.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+};
+
 // Muestra un mensaje simple (informativo o de error).
 function mostrarMensaje(texto, esError = false) {
   resultado.classList.remove("oculto");
