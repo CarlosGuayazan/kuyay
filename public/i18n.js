@@ -58,6 +58,14 @@
       estadoNo: "No",
       btnCheckin: "✅ Completa tu registro en línea",
       checkinListo: "✔️ Tu registro ya está completo.",
+      rcCancelar: "Cancelar mi reservación",
+      rcCancelarConfirm:
+        "¿Seguro que deseas cancelar tu reservación? Esta acción no se puede deshacer.",
+      rcCancelando: "Cancelando...",
+      rcCancelarOk: "Tu reservación fue cancelada.",
+      rcCancelarNo:
+        "Esta reservación no se puede cancelar desde aquí. Escríbenos y te ayudamos.",
+      rcCancelarErr: "No se pudo cancelar. Intenta de nuevo o contáctanos.",
       qrCheckin: "📱 Escanea con tu celular para completar tu registro",
       qrPagar: "📱 Escanea con tu celular para continuar el pago",
       qrReservar: "📱 Escanea con tu celular para reservar",
@@ -161,6 +169,14 @@
       estadoNo: "No",
       btnCheckin: "✅ Complete your online check-in",
       checkinListo: "✔️ Your check-in is already complete.",
+      rcCancelar: "Cancel my reservation",
+      rcCancelarConfirm:
+        "Are you sure you want to cancel your reservation? This cannot be undone.",
+      rcCancelando: "Cancelling...",
+      rcCancelarOk: "Your reservation has been cancelled.",
+      rcCancelarNo:
+        "This reservation can't be cancelled here. Contact us and we'll help.",
+      rcCancelarErr: "Couldn't cancel. Please try again or contact us.",
       qrCheckin: "📱 Scan with your phone to complete your check-in",
       qrPagar: "📱 Scan with your phone to continue the payment",
       qrReservar: "📱 Scan with your phone to book",
@@ -267,6 +283,15 @@
       estadoNo: "Nein",
       btnCheckin: "✅ Online-Check-in abschließen",
       checkinListo: "✔️ Ihr Check-in ist bereits abgeschlossen.",
+      rcCancelar: "Meine Reservierung stornieren",
+      rcCancelarConfirm:
+        "Möchten Sie Ihre Reservierung wirklich stornieren? Dies kann nicht rückgängig gemacht werden.",
+      rcCancelando: "Wird storniert...",
+      rcCancelarOk: "Ihre Reservierung wurde storniert.",
+      rcCancelarNo:
+        "Diese Reservierung kann hier nicht storniert werden. Kontaktieren Sie uns, wir helfen Ihnen.",
+      rcCancelarErr:
+        "Stornierung fehlgeschlagen. Bitte erneut versuchen oder uns kontaktieren.",
       qrCheckin: "📱 Mit dem Handy scannen, um den Check-in abzuschließen",
       qrPagar: "📱 Mit dem Handy scannen, um die Zahlung fortzusetzen",
       qrReservar: "📱 Mit dem Handy scannen, um zu buchen",
@@ -374,6 +399,14 @@
       estadoNo: "Non",
       btnCheckin: "✅ Effectuez votre enregistrement en ligne",
       checkinListo: "✔️ Votre enregistrement est déjà effectué.",
+      rcCancelar: "Annuler ma réservation",
+      rcCancelarConfirm:
+        "Voulez-vous vraiment annuler votre réservation ? Cette action est irréversible.",
+      rcCancelando: "Annulation...",
+      rcCancelarOk: "Votre réservation a été annulée.",
+      rcCancelarNo:
+        "Cette réservation ne peut pas être annulée ici. Contactez-nous, nous vous aiderons.",
+      rcCancelarErr: "Échec de l'annulation. Réessayez ou contactez-nous.",
       qrCheckin: "📱 Scannez avec votre téléphone pour faire votre enregistrement",
       qrPagar: "📱 Scannez avec votre téléphone pour continuer le paiement",
       qrReservar: "📱 Scannez avec votre téléphone pour réserver",
@@ -475,6 +508,12 @@
       estadoNo: "否",
       btnCheckin: "✅ 在线完成登记",
       checkinListo: "✔️ 您的登记已完成。",
+      rcCancelar: "取消我的预订",
+      rcCancelarConfirm: "确定要取消您的预订吗？此操作无法撤销。",
+      rcCancelando: "正在取消…",
+      rcCancelarOk: "您的预订已取消。",
+      rcCancelarNo: "此预订无法在此取消。请联系我们，我们将为您提供帮助。",
+      rcCancelarErr: "取消失败。请重试或联系我们。",
       qrCheckin: "📱 用手机扫码完成登记",
       qrPagar: "📱 用手机扫码继续付款",
       qrReservar: "📱 用手机扫码预订",
@@ -570,6 +609,15 @@
       estadoNo: "いいえ",
       btnCheckin: "✅ オンラインで登録を完了する",
       checkinListo: "✔️ 登録は完了しています。",
+      rcCancelar: "予約をキャンセルする",
+      rcCancelarConfirm:
+        "予約をキャンセルしてもよろしいですか？この操作は元に戻せません。",
+      rcCancelando: "キャンセル中…",
+      rcCancelarOk: "予約がキャンセルされました。",
+      rcCancelarNo:
+        "この予約はここではキャンセルできません。お問い合わせください。",
+      rcCancelarErr:
+        "キャンセルできませんでした。もう一度お試しいただくかお問い合わせください。",
       qrCheckin: "📱 スマートフォンでスキャンして登録を完了",
       qrPagar: "📱 スマートフォンでスキャンして支払いを続ける",
       qrReservar: "📱 スマートフォンでスキャンして予約",

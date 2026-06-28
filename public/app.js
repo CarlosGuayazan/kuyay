@@ -158,6 +158,18 @@ function mostrarReserva(r) {
       <p class="checkin-listo">${T("checkinListo")}</p>`;
   }
 
+  // ¿Se puede cancelar desde aquí? Solo reservas directas/propias (NO de
+  // Booking u otras OTAs) y sin check-in/check-out. Además, el servidor de
+  // LobbyPMS rechaza cualquier reserva no creada por la API (red de seguridad).
+  const canal = (r.channel && r.channel.name) ? String(r.channel.name) : "";
+  const esOTA = /booking|expedia|hostelworld|hostel\s*world|airbnb|despegar|agoda/i.test(canal);
+  const esCancelable = !r.checked_in && !r.checked_out && !esOTA;
+  const bloqueCancelar = esCancelable
+    ? `<div class="cancelar-zona">
+         <button type="button" id="btnCancelarReserva" class="link-cancelar">${T("rcCancelar")}</button>
+       </div>`
+    : "";
+
   resultado.classList.remove("oculto");
   resultado.innerHTML = `
     <div class="tarjeta-reserva">
@@ -181,11 +193,65 @@ function mostrarReserva(r) {
         ${typeof construirSeccionPago === "function" ? construirSeccionPago(r) : ""}
         ${bloqueCheckin}
       </div>
+      ${bloqueCancelar}
     </div>
   `;
 
+  // Botón discreto de cancelación (si aplica).
+  const btnCancelar = document.getElementById("btnCancelarReserva");
+  if (btnCancelar) {
+    btnCancelar.addEventListener("click", () => cancelarReservaActual(r));
+  }
+
   // En la isla, genera el QR del check-in (y de los pagos si aplica).
   if (window.generarQRsEn) generarQRsEn(resultado);
+}
+
+// Cancela la reserva mostrada (vía /api/cancelar -> VPS -> LobbyPMS). Pide
+// confirmación. LobbyPMS solo permite cancelar reservas creadas por la API;
+// para Booking/OTAs u otras devuelve un error y mostramos un aviso amable.
+async function cancelarReservaActual(r) {
+  if (!r || !r.booking_id) return;
+  if (!confirm(T("rcCancelarConfirm"))) return;
+  const btn = document.getElementById("btnCancelarReserva");
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = T("rcCancelando");
+  }
+  try {
+    const resp = await fetch("/api/cancelar", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ booking_id: r.booking_id, sede: r.sede }),
+    });
+    const data = await resp.json().catch(() => ({}));
+    if (resp.ok && data.ok) {
+      ultimaReserva = null;
+      mostrarMensaje(T("rcCancelarOk"), false);
+      return;
+    }
+    // Errores que significan "no se puede cancelar desde aquí".
+    const noPermitido = [
+      "UNAUTHORIZED_BOOKING",
+      "RESTRICTED_RESERVATION",
+      "BOOKING_CHECK_IN_COMPLETE",
+      "RECORD_NOT_FOUND",
+    ];
+    const msg = noPermitido.includes(data.error_code)
+      ? T("rcCancelarNo")
+      : T("rcCancelarErr");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = T("rcCancelar");
+    }
+    alert(msg);
+  } catch (e) {
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = T("rcCancelar");
+    }
+    alert(T("rcCancelarErr"));
+  }
 }
 
 // En la isla de registro, convertimos los botones de reserva (Ayllu/Yachi)
