@@ -670,3 +670,63 @@ footer {
 body.con-teclado {
   padding-bottom: 320px;
 }
+
+/* ===== Privacidad del kiosko: botón "Finalizar" + aviso de inactividad ===== */
+
+/* Botón visible para cerrar/limpiar manualmente (abajo a la derecha). */
+#kiosko-finalizar {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 900; /* debajo de teclado/modal/calendario: nunca flota sobre ellos */
+  background: #6b7280;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  cursor: pointer;
+}
+
+/* Aviso de "¿sigues ahí?" con cuenta regresiva (encima de todo). */
+#kiosko-aviso {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  z-index: 3000; /* por encima del teclado (2000) y modales */
+}
+#kiosko-aviso.visible {
+  display: flex;
+}
+.kiosko-aviso-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 28px 24px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 16px 50px rgba(0, 0, 0, 0.35);
+}
+#kiosko-aviso-texto {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #222;
+  margin: 0 0 20px;
+}
+#kiosko-aviso-sigo {
+  background: #ff8800;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 28px;
+  font-size: 1.2rem;
+  font-weight: 800;
+  cursor: pointer;
+  width: 100%;
+}
