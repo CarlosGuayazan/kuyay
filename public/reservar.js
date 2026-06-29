@@ -39,6 +39,7 @@
       fechaInvalida: "Elige una fecha de salida posterior a la de llegada.",
       desde: "Desde", estancia: "estancia", noche: "noche", noches: "noches",
       persona: "persona", personas: "personas", reservar: "Reservar", cerrar: "Cerrar",
+      seleccionar: "Seleccionar",
       nombre: "Nombre(s)", apellido: "Apellido(s)",
       telefono: "Teléfono (con código país, ej. +57...)",
       nacionalidad: "Nacionalidad", correo: "Correo", documento: "Documento / Identificación",
@@ -57,6 +58,7 @@
       fechaInvalida: "Pick a check-out date after the check-in date.",
       desde: "From", estancia: "stay", noche: "night", noches: "nights",
       persona: "guest", personas: "guests", reservar: "Book", cerrar: "Close",
+      seleccionar: "Select",
       nombre: "First name(s)", apellido: "Last name(s)",
       telefono: "Phone (with country code, e.g. +57...)",
       nacionalidad: "Nationality", correo: "Email", documento: "ID / Document number",
@@ -91,8 +93,20 @@
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
     );
 
+  // ---------- Helpers de fecha (en horario LOCAL, sin líos de zona horaria) ----------
+  const toISO = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  const hoyISO = () => toISO(new Date());
+  const parseISO = (s) => { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); };
+  const addDays = (iso, n) => { const d = parseISO(iso); d.setDate(d.getDate() + n); return toISO(d); };
+  const locale = () => (lang() === "es" ? "es-CO" : "en-US");
+  const fmtFecha = (iso) =>
+    iso ? new Intl.DateTimeFormat(locale(), { weekday: "short", day: "numeric", month: "short" }).format(parseISO(iso)) : "";
+
   let ROOMS = [];
   let consulta = { start: "", end: "" };
+  let sel = { start: "", end: "" }; // selección actual de fechas del buscador
+  let selInit = false;
 
   // ---------- Modal (montado en <body> para que no lo recorte nada) ----------
   function modalEl() {
@@ -123,31 +137,121 @@
   function montar() {
     const cont = $(".disponibilidad");
     if (!cont) return;
-    const hoy = new Date().toISOString().slice(0, 10);
-    const inVal = consulta.start || hoy;
-    const outVal = consulta.end || "";
+    if (!selInit) { // inicializa la selección una sola vez (conserva al cambiar idioma)
+      sel.start = consulta.start || hoyISO();
+      sel.end = consulta.end || "";
+      selInit = true;
+    }
     cont.innerHTML = `
       <h2>${T("titulo")}</h2>
       <div class="rsv-buscador">
         <label class="rsv-campo">${T("llegada")}
-          <input type="date" id="rsv-in" min="${hoy}" value="${inVal}" />
+          <input type="text" id="rsv-in" class="rsv-fecha" readonly data-no-teclado
+                 placeholder="${T("seleccionar")}" value="${esc(fmtFecha(sel.start))}" />
         </label>
         <label class="rsv-campo">${T("salida")}
-          <input type="date" id="rsv-out" min="${hoy}" value="${outVal}" />
+          <input type="text" id="rsv-out" class="rsv-fecha" readonly data-no-teclado
+                 placeholder="${T("seleccionar")}" value="${esc(fmtFecha(sel.end))}" />
         </label>
         <button class="rsv-boton" id="rsv-buscar">${T("buscar")}</button>
       </div>
       <p class="rsv-estado" id="rsv-estado"></p>
       <div class="rsv-grid" id="rsv-grid"></div>`;
     modalEl();
+    // Calendario de Llegada: desde hoy en adelante.
+    $("#rsv-in").addEventListener("click", () =>
+      abrirCalendario({
+        value: sel.start,
+        min: hoyISO(),
+        onPick: (d) => {
+          sel.start = d;
+          // La salida nunca puede ser anterior o igual a la llegada.
+          if (sel.end && sel.end <= d) sel.end = "";
+          sincFechas();
+        },
+      })
+    );
+    // Calendario de Salida: SIEMPRE posterior a la llegada.
+    $("#rsv-out").addEventListener("click", () =>
+      abrirCalendario({
+        value: sel.end,
+        min: addDays(sel.start || hoyISO(), 1),
+        onPick: (d) => { sel.end = d; sincFechas(); },
+      })
+    );
     $("#rsv-buscar").addEventListener("click", buscar);
     if (ROOMS.length) pintar();
   }
 
+  // Refresca el texto mostrado en los dos campos de fecha.
+  function sincFechas() {
+    const i = $("#rsv-in"), o = $("#rsv-out");
+    if (i) i.value = fmtFecha(sel.start);
+    if (o) o.value = fmtFecha(sel.end);
+  }
+
+  // ---------- Calendario táctil (grande, amigable a los dedos) ----------
+  function abrirCalendario({ value, min, max, onPick }) {
+    const view = parseISO(value || min || hoyISO());
+    view.setDate(1);
+    const ov = document.createElement("div");
+    ov.className = "cal-modal";
+    ov.innerHTML = '<div class="cal-card" id="cal-card"></div>';
+    ov.addEventListener("click", (e) => { if (e.target === ov) cerrar(); });
+    document.body.appendChild(ov);
+    requestAnimationFrame(() => ov.classList.add("abierto"));
+
+    function cerrar() {
+      ov.classList.remove("abierto");
+      setTimeout(() => ov.remove(), 150);
+    }
+    const cap = (s) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
+
+    function render() {
+      const loc = locale();
+      const titulo = cap(new Intl.DateTimeFormat(loc, { month: "long", year: "numeric" }).format(view));
+      const dows = [];
+      // 2024-01-01 fue lunes: nombres de día empezando en lunes.
+      for (let i = 0; i < 7; i++)
+        dows.push(new Intl.DateTimeFormat(loc, { weekday: "short" }).format(new Date(2024, 0, 1 + i)));
+      const y = view.getFullYear(), mo = view.getMonth();
+      const startOffset = (new Date(y, mo, 1).getDay() + 6) % 7; // 0 = lunes
+      const diasMes = new Date(y, mo + 1, 0).getDate();
+      let cells = "";
+      for (let i = 0; i < startOffset; i++) cells += '<span class="cal-day empty"></span>';
+      for (let d = 1; d <= diasMes; d++) {
+        const iso = toISO(new Date(y, mo, d));
+        const off = (min && iso < min) || (max && iso > max);
+        const cls = ["cal-day"];
+        if (off) cls.push("disabled");
+        if (iso === value) cls.push("sel");
+        if (iso === hoyISO()) cls.push("today");
+        cells += `<button type="button" class="${cls.join(" ")}" ${off ? "disabled" : ""} data-iso="${iso}">${d}</button>`;
+      }
+      $("#cal-card").innerHTML = `
+        <div class="cal-header">
+          <button type="button" class="cal-nav" data-nav="-1" aria-label="anterior">‹</button>
+          <span class="cal-title">${esc(titulo)}</span>
+          <button type="button" class="cal-nav" data-nav="1" aria-label="siguiente">›</button>
+        </div>
+        <div class="cal-dows">${dows.map((d) => `<span>${esc(d)}</span>`).join("")}</div>
+        <div class="cal-grid">${cells}</div>
+        <button type="button" class="rsv-boton secundario" id="cal-cerrar" style="width:100%;margin-top:12px">${T("cerrar")}</button>`;
+      ov.querySelectorAll(".cal-nav").forEach((b) =>
+        b.addEventListener("click", () => { view.setMonth(view.getMonth() + Number(b.dataset.nav)); render(); })
+      );
+      ov.querySelectorAll(".cal-day[data-iso]:not(.disabled)").forEach((b) =>
+        b.addEventListener("click", () => { onPick(b.dataset.iso); cerrar(); })
+      );
+      $("#cal-cerrar").addEventListener("click", cerrar);
+    }
+    render();
+  }
+
   // ---------- Buscar disponibilidad ----------
   async function buscar() {
-    const start = $("#rsv-in").value;
-    const end = $("#rsv-out").value;
+    const start = sel.start;
+    const end = sel.end;
     const est = $("#rsv-estado");
     if (!start || !end || end <= start) {
       est.textContent = T("fechaInvalida");
@@ -326,6 +430,7 @@
 
   // ---------- Arranque + re-traducción al cambiar idioma ----------
   function iniciar() {
+    if (window.ES_KIOSKO) document.body.classList.add("kiosko");
     montar();
     if (window.I18N && window.I18N.onChange) {
       window.I18N.onChange(() => montar()); // re-render en el idioma nuevo (conserva fechas/resultados)

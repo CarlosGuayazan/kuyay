@@ -117,3 +117,94 @@
   font-weight: 600;
   text-align: center;
 }
+
+/* ===== Campos de fecha (abren el calendario táctil) ===== */
+.rsv-fecha {
+  cursor: pointer;
+  background: #fff;
+  min-width: 150px;
+}
+
+/* ===== Calendario táctil (grande, amigable a los dedos) ===== */
+.cal-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 14px;
+  z-index: 1500;
+}
+.cal-modal.abierto { display: flex; }
+.cal-card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: 0 12px 44px rgba(0, 0, 0, 0.3);
+}
+.cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.cal-title { font-weight: 800; font-size: 1.15rem; text-transform: capitalize; }
+.cal-nav {
+  width: 46px;
+  height: 46px;
+  border: none;
+  border-radius: 12px;
+  background: #fff3e0;
+  color: #ff8800;
+  font-size: 1.7rem;
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+}
+.cal-dows {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 6px;
+}
+.cal-dows span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+}
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.cal-day {
+  height: 46px;
+  border: none;
+  border-radius: 10px;
+  background: #f5f5f5;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #222;
+  cursor: pointer;
+}
+.cal-day.empty { background: transparent; cursor: default; }
+.cal-day.today { outline: 2px solid #ffc081; }
+.cal-day.sel { background: #ff8800; color: #fff; }
+.cal-day.disabled { color: #ccc; background: #fafafa; cursor: default; }
+
+@media (min-width: 480px) {
+  .cal-card { max-width: 420px; }
+  .cal-day { height: 52px; font-size: 1.15rem; }
+}
+
+/* En el kiosko (isla táctil) todo un poco más grande para los dedos */
+body.kiosko .rsv-fecha { font-size: 1.1rem; padding: 14px; }
+body.kiosko .cal-card { max-width: 460px; }
+body.kiosko .cal-day { height: 60px; font-size: 1.3rem; }
+body.kiosko .cal-nav { width: 54px; height: 54px; }
+
+/* El teclado táctil debe quedar POR ENCIMA del modal de reserva, y el modal
+   se alinea arriba para que el formulario no quede tapado por el teclado. */
+body.con-teclado .rsv-modal { align-items: flex-start; }
+body.con-teclado .rsv-modal-card { margin-top: 10px; max-height: calc(100vh - 340px); }

@@ -644,7 +644,7 @@ footer {
   background: #e9edf5;
   padding: 10px;
   box-shadow: 0 -6px 24px rgba(20, 30, 60, 0.18);
-  z-index: 1000;
+  z-index: 2000; /* por encima del modal de reserva (1000) y del calendario (1500) */
   transition: transform 0.25s ease;
 }
 

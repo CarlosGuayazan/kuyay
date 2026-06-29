@@ -92,30 +92,36 @@
     inputActivo = null;
   }
 
-  // ---- 4) Conectar el teclado con los campos del formulario ----
-  const campos = document.querySelectorAll(
-    'input[type="text"], input[type="email"], input[type="search"], input[type="tel"]'
-  );
+  // ---- 4) Conectar el teclado con CUALQUIER campo de texto ----
+  //  Usamos DELEGACIÓN de eventos (escuchamos en todo el documento) en vez de
+  //  enganchar campo por campo al cargar. Así también funciona en los campos
+  //  que se crean dinámicamente, como el módulo "Consulta tu disponibilidad"
+  //  y el formulario de reserva (antes el teclado no se activaba ahí).
+  function esCampoDeTexto(el) {
+    if (!el || el.tagName !== "INPUT") return false;
+    if (el.readOnly || el.disabled) return false; // p. ej. los campos de fecha
+    if (el.hasAttribute("data-no-teclado")) return false;
+    const tipo = (el.getAttribute("type") || "text").toLowerCase();
+    return ["text", "email", "search", "tel", "url", "password"].includes(tipo);
+  }
 
-  campos.forEach((campo) => {
-    campo.addEventListener("focus", () => {
-      inputActivo = campo;
-      teclado.setInput(campo.value);
-      teclado.setOptions({ layoutName: "default" });
-      mostrar();
-      // Desplazamos el campo a la vista para que el teclado no lo tape.
-      setTimeout(
-        () => campo.scrollIntoView({ block: "center", behavior: "smooth" }),
-        150
-      );
-    });
+  document.addEventListener("focusin", (evento) => {
+    const campo = evento.target;
+    if (!esCampoDeTexto(campo)) return;
+    inputActivo = campo;
+    teclado.setInput(campo.value);
+    teclado.setOptions({ layoutName: "default" });
+    mostrar();
+    // Desplazamos el campo a la vista para que el teclado no lo tape.
+    setTimeout(
+      () => campo.scrollIntoView({ block: "center", behavior: "smooth" }),
+      150
+    );
   });
 
   // ---- 5) Ocultar el teclado al tocar fuera de un campo o del teclado ----
   document.addEventListener("mousedown", (evento) => {
     const dentroDelTeclado = contenedor.contains(evento.target);
-    const esUnCampo =
-      evento.target.matches && evento.target.matches("input");
-    if (!dentroDelTeclado && !esUnCampo) ocultar();
+    if (!dentroDelTeclado && !esCampoDeTexto(evento.target)) ocultar();
   });
 })();
